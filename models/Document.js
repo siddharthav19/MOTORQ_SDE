@@ -15,6 +15,11 @@ const DocumentSchema = new mongoose.Schema({
     ],
     default: [],
   },
+  links: [String],
+  generatedLinkCount: {
+    type: Number,
+    default: 0,
+  },
   title: {
     type: String,
     required: [true, "A Document Must have a title"],

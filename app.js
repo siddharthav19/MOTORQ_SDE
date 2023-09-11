@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const userRouter = require("./routes/userRouter");
 const globalErrorHandler = require("./controllers/errorHandler");
+const authController = require("./controllers/authController");
+const userController = require("./controllers/userController");
 dotenv.config({
   path: "./config.env",
 });
@@ -12,7 +13,9 @@ const PORT = 3000;
 const DB_URI = process.env.DB_URI;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/user", userRouter);
+
+app.get("/users", userController.getAllUsers);
+app.post("/signup", authController.signupHandler);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server`, 404));

@@ -1,15 +1,28 @@
-const jwt = require("jsonwebtoken");
 const AppError = require("./../utils/AppError");
 const catchAsyncError = require("./../utils/catchAsyncError");
 const User = require("./../models/User");
-const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
 
-const signToken = (id) => {
-  return jwt.sign({ id: id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+const signupHandler = catchAsyncError(async (req, res, next) => {
+  const { phoneNumber, password } = req.body;
+  const user = await User.create({
+    phoneNumber,
+    password,
   });
-};
+  res.json({
+    id: user._id,
+    phoneNumber,
+    status: "User created successfully",
+  });
+});
 
-const signupHandler = catchAsyncError(async (req,res,next)=>{
-     
-})
+const loginMiddleware = catchAsyncError(async (req, res, next) => {
+  const { phoneNumber, password } = req.body;
+  const user = await User.find({ phoneNumber });
+  if (!user || password != user.password) {
+    return next(new AppError(`Invalid Credentials`, 400));
+  }
+  next();
+});
+
+exports.signupHandler = signupHandler;
+exports.loginMiddleware = loginMiddleware;

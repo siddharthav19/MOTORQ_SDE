@@ -25,7 +25,7 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 mongoose
-  .connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect("mongodb+srv://siddharthavadlapudi3738:CPcSXudzA2WxlCYo@cluster0.cdut8jw.mongodb.net/taskBackend?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, () => console.log(`db and server running at ${PORT}`));
   });

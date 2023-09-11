@@ -9,4 +9,9 @@ router.post(
   documentController.uploadDocument
 );
 router.get("/", authController.loginMiddleware, documentController.getDocument);
+router.delete(
+  "/:documentId",
+  authController.loginMiddleware,
+  documentController.deleteDocument
+);
 module.exports = router;

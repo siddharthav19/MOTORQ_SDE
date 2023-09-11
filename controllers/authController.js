@@ -16,8 +16,8 @@ const signupHandler = catchAsyncError(async (req, res, next) => {
 });
 
 const loginMiddleware = catchAsyncError(async (req, res, next) => {
-  const { phoneNumber, password } = req.body;
-  const user = await User.findOne({ phoneNumber });
+  const { phonenumber, password } = req.headers;
+  const user = await User.findOne({ phoneNumber: phonenumber });
   if (!user || password !== user.password) {
     return next(
       new AppError(

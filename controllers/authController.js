@@ -17,10 +17,16 @@ const signupHandler = catchAsyncError(async (req, res, next) => {
 
 const loginMiddleware = catchAsyncError(async (req, res, next) => {
   const { phoneNumber, password } = req.body;
-  const user = await User.find({ phoneNumber });
-  if (!user || password != user.password) {
-    return next(new AppError(`Invalid Credentials`, 400));
+  const user = await User.findOne({ phoneNumber });
+  if (!user || password !== user.password) {
+    return next(
+      new AppError(
+        `Invalid Credentials You must be logged in to proceed further`,
+        400
+      )
+    );
   }
+  req.userId = user._id;
   next();
 });
 

@@ -23,5 +23,10 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+UserSchema.virtual("ownedDocuments", {
+  ref: "Document",
+  foreignField: "owner",
+  localField: "_id",
+});
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

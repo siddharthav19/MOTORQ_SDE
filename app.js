@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const globalErrorHandler = require("./controllers/errorHandler");
 const authController = require("./controllers/authController");
 const userController = require("./controllers/userController");
+const documentRouter = require("./routes/documentRoutes");
 dotenv.config({
   path: "./config.env",
 });
@@ -16,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/users", userController.getAllUsers);
 app.post("/signup", authController.signupHandler);
-
+app.use("/document", documentRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server`, 404));
 });

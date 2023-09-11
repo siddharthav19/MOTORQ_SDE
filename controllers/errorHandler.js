@@ -35,7 +35,6 @@ const handleValidationErrorDB = (err) => {
 
 //to build a error object and send response based on the error object
 const sendErrorDev = (err, res) => {
-  //DEVELOPMENT TIME ERROR HANDLING
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -45,18 +44,12 @@ const sendErrorDev = (err, res) => {
 };
 
 const sendErrorProd = (err, res) => {
-  //PRODCTION TIME ERROR HANDLING
-  //PREDICTABLE OPERATIONAL ERRORS send the error message or details about the error
   if (err.isOperational === true) {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
     });
   } else {
-    //UNEXPECTED ERROR or non operational error : don't leak details about the error
-    //1) LOG TO THE CONSOLE
-    // console.log(err);
-    //2) SEND GENERIC RESPONSE/MESSAGE
     res.status(500).json({
       status: "error",
       message: "Something went really wrong",
@@ -65,24 +58,22 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-  // const s = err.message
-
-  //   console.log(err.stack);
-  //err.stack contains printStackTrace data
-  //404 -> fail
+  //404 -> fail (should ask modify this codes)
   //500 -> error
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
-  // if (process.env.NODE_ENV.localeCompare('development')) {
-  /// if (process.env.NODE_ENV === "development") {
-  ///   sendErrorDev(err, res);
-  /// } else if (process.env.NODE_ENV === "production") {
-  let error = Object.assign(err);
-  // console.log(error.name);
-  if (error.constructor.name === "CastError") error = handleCastErrorDB(error);
-  if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-  if (error.name === "ValidationError") error = handleValidationErrorDB(error);
-  if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
-  if (error.name === "JsonWebTokenError") error = handleJWTError();
-  sendErrorProd(error, res);
+  if (process.env.NODE_ENV === "development") {
+    sendErrorDev(err, res);
+  } else if (process.env.NODE_ENV === "production") {
+    let error = Object.assign(err);
+    // console.log(error.name);
+    if (error.constructor.name === "CastError")
+      error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (error.name === "ValidationError")
+      error = handleValidationErrorDB(error);
+    if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
+    if (error.name === "JsonWebTokenError") error = handleJWTError();
+    sendErrorProd(error, res);
+  }
 };

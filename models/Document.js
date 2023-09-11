@@ -6,12 +6,15 @@ const DocumentSchema = new mongoose.Schema({
     ref: "User",
     required: [true, "A document must belongs to a user"],
   },
-  access: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
-  ],
+  access: {
+    type: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
+    default: [],
+  },
   title: {
     type: String,
     required: [true, "A Document Must have a title"],

@@ -14,4 +14,8 @@ router.delete(
   authController.loginMiddleware,
   documentController.deleteDocument
 );
+router
+  .route("/:documentId/shared")
+  .get(authController.loginMiddleware, documentController.getSharedDocuments) //!TODO
+  .post(authController.loginMiddleware, documentController.addAccessToDocument); //!TODO
 module.exports = router;

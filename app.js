@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/users", userController.getAllUsers);
 app.post("/signup", authController.signupHandler);
 app.use("/document", documentRouter);
+
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server`, 404));
 });

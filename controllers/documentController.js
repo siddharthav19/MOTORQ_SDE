@@ -82,6 +82,11 @@ const addAccessToDocument = catchAsyncError(async (req, res, next) => {
   if (!doc) {
     return next(new AppError("doc doesnot exists", 404));
   }
+  let x = doc.access.length;
+  for (let i = 0; i < x; i++) {
+    doc.access.pop();
+  }
+  await doc.save();
   arr.forEach((e) => {
     doc.access.push(e);
   });
@@ -92,8 +97,74 @@ const addAccessToDocument = catchAsyncError(async (req, res, next) => {
   });
 });
 
+const getAccessibleDocuments = catchAsyncError(async (req, res, next) => {
+  const ownerId = req.userId;
+  const docs = await Document.aggregate([
+    {
+      $unwind: "$access",
+    },
+    {
+      $match: {
+        access: ownerId,
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        _id: 1,
+        owner: 1,
+      },
+    },
+  ]);
+  console.log(docs);
+  res.json({
+    accesible: docs,
+  });
+});
+
+const viewDoc = catchAsyncError(async (req, res, next) => {
+  const ownerId = req.userId;
+  const docId = req.params.documentId;
+  const docs = await Document.aggregate([
+    {
+      $unwind: "$access",
+    },
+
+    {
+      $match: {
+        $or: [{ accesible: ownerId }, { owner: ownerId }],
+        // $and: [
+        //   { $or: [{ accesible: ownerId }, { owner: ownerId }] },
+        //   { _id: docId },
+        // ],
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        _id: 1,
+        owner: 1,
+      },
+    },
+  ]);
+  const document = docs.find((e) => {
+    return e._id == docId;
+  });
+  if (!document) {
+    res.status(406).json({
+      message: "Document doesnot exists/You cannot access the document",
+    });
+  }
+  console.log(document);
+  res.status(200).json({
+    document,
+  });
+});
+
 exports.uploadDocument = uploadDocument;
 exports.getDocument = getDocument;
 exports.deleteDocument = deleteDocument;
 exports.getSharedDocuments = getSharedDocuments;
 exports.addAccessToDocument = addAccessToDocument;
+exports.getAccessibleDocuments = getAccessibleDocuments;
+exports.viewDoc = viewDoc;
